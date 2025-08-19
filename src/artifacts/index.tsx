@@ -365,7 +365,7 @@ const WeightliftingApp = () => {
     const totalExercises = workoutProgram[currentDay].exercises.length;
     let completedExercises = 0;
     
-    workoutProgram[currentDay].exercises.forEach((_: any, exerciseIndex: number) => {
+    workoutProgram[currentDay].exercises.forEach((exercise: any, exerciseIndex: number) => {
       const exerciseCompleted = workoutProgram[currentDay].exercises[exerciseIndex].sets;
       let setsCompleted = 0;
       for (let setIndex = 0; setIndex < exerciseCompleted; setIndex++) {
@@ -604,7 +604,7 @@ const WeightliftingApp = () => {
               }`}
             >
               <div className="font-semibold">Day {day}</div>
-              <div className="text-sm text-gray-600">{workoutProgram[day].name}</div>
+              <div className="text-sm text-gray-600">{(workoutProgram as any)[day].name}</div>
             </button>
           ))}
         </div>
