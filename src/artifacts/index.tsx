@@ -9,14 +9,14 @@ const WeightliftingApp = () => {
   const [isResting, setIsResting] = useState(false);
   const [restTime, setRestTime] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [exerciseWeights, setExerciseWeights] = useState({});
-  const [completedSets, setCompletedSets] = useState({});
+  const [exerciseWeights, setExerciseWeights] = useState<{ [key: string]: string }>({});
+  const [completedSets, setCompletedSets] = useState<{ [key: string]: boolean }>({});
   const [activeTab, setActiveTab] = useState('workout');
-  const [expandedExercise, setExpandedExercise] = useState(null);
+  const [expandedExercise, setExpandedExercise] = useState<number | null>(null);
   
-  const timerRef = useRef(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const workoutProgram: Record<number, any> = {
+  const workoutProgram = {
     1: { // Day 1: Upper Body
       name: "Upper Body Focus",
       warmup: "5-10 minutes light cardio + arm circles and shoulder rolls",
@@ -275,7 +275,7 @@ const WeightliftingApp = () => {
         }
       ]
     }
-  };
+  } as { [key: number]: any };
 
   const getCurrentPhase = () => {
     if (currentWeek <= 2) return { phase: "Foundation Phase", focus: "Learning proper form, lighter weights" };
@@ -299,13 +299,13 @@ const WeightliftingApp = () => {
     };
   }, [restTime, isTimerRunning]);
 
-  const formatTime = (seconds) => {
+  const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const startRest = (duration) => {
+  const startRest = (duration: number) => {
     setRestTime(duration);
     setIsResting(true);
     setIsTimerRunning(true);
@@ -337,17 +337,17 @@ const WeightliftingApp = () => {
     }
   };
 
-  const updateWeight = (exerciseIndex, weight) => {
+  const updateWeight = (exerciseIndex: number, weight: string | number) => {
     const key = `w${currentWeek}-d${currentDay}-e${exerciseIndex}`;
-    setExerciseWeights(prev => ({...prev, [key]: weight}));
+    setExerciseWeights(prev => ({...prev, [key]: weight.toString()}));
   };
 
-  const getWeight = (exerciseIndex) => {
+  const getWeight = (exerciseIndex: number) => {
     const key = `w${currentWeek}-d${currentDay}-e${exerciseIndex}`;
     return exerciseWeights[key] || '';
   };
 
-  const isSetCompleted = (exerciseIndex, setIndex) => {
+  const isSetCompleted = (exerciseIndex: number, setIndex: number) => {
     const key = `w${currentWeek}-d${currentDay}-e${exerciseIndex}-s${setIndex}`;
     return completedSets[key] || false;
   };
@@ -365,7 +365,7 @@ const WeightliftingApp = () => {
     const totalExercises = workoutProgram[currentDay].exercises.length;
     let completedExercises = 0;
     
-    workoutProgram[currentDay].exercises.forEach((_, exerciseIndex) => {
+    workoutProgram[currentDay].exercises.forEach((_: any, exerciseIndex: number) => {
       const exerciseCompleted = workoutProgram[currentDay].exercises[exerciseIndex].sets;
       let setsCompleted = 0;
       for (let setIndex = 0; setIndex < exerciseCompleted; setIndex++) {
@@ -440,9 +440,9 @@ const WeightliftingApp = () => {
 
       {/* Exercises */}
       <div className="space-y-4">
-        {workoutProgram[currentDay].exercises.map((exercise, exerciseIndex) => {
+        {workoutProgram[currentDay].exercises.map((exercise: any, exerciseIndex: number) => {
           const isCurrentExercise = exerciseIndex === currentExercise;
-          const allSetsCompleted = Array.from({length: exercise.sets}).every((_, setIndex) => 
+          const allSetsCompleted = Array.from({length: exercise.sets}).every((_: any, setIndex: number) => 
             isSetCompleted(exerciseIndex, setIndex)
           );
 
@@ -536,7 +536,7 @@ const WeightliftingApp = () => {
               )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-3">
-                {Array.from({length: exercise.sets}).map((_, setIndex) => {
+                {Array.from({length: exercise.sets}).map((_: any, setIndex: number) => {
                   const isCurrentSet = exerciseIndex === currentExercise && setIndex === currentSet;
                   const isCompleted = isSetCompleted(exerciseIndex, setIndex);
                   
@@ -664,7 +664,7 @@ const WeightliftingApp = () => {
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <h3 className="text-xl font-semibold mb-4">Week Progression</h3>
         <div className="space-y-3">
-          {Array.from({length: 12}).map((_, weekIndex) => {
+          {Array.from({length: 12}).map((_: any, weekIndex: number) => {
             const week = weekIndex + 1;
             const isCurrentWeek = week === currentWeek;
             const isCompleted = week < currentWeek;
@@ -748,4 +748,4 @@ const WeightliftingApp = () => {
   );
 };
 
-export default WeightliftingApp;
+export default WeightliftingApp; 
