@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, RotateCcw, Trophy, Calendar, TrendingUp, Dumbbell, Clock, CheckCircle2, Plus, Minus, Info, ChevronDown, ChevronUp } from 'lucide-react';
 
 const WeightliftingApp = () => {
