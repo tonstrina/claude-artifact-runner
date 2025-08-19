@@ -16,7 +16,7 @@ const WeightliftingApp = () => {
   
   const timerRef = useRef(null);
 
-  const workoutProgram = {
+  const workoutProgram: Record<number, any> = {
     1: { // Day 1: Upper Body
       name: "Upper Body Focus",
       warmup: "5-10 minutes light cardio + arm circles and shoulder rolls",
