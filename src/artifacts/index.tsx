@@ -1,15 +1,30 @@
 import React, { useState } from 'react';
 import { Plus, User, FileText, Download, Edit2, Trash2, Calendar, Search } from 'lucide-react';
 
+interface Note {
+  id: number;
+  content: string;
+  date: string;
+  createdAt: string;
+  lastModified?: string;
+}
+
+interface Client {
+  id: number;
+  name: string;
+  notes: Note[];
+  createdAt: string;
+}
+
 const ClientNotesApp = () => {
-  const [clients, setClients] = useState([]);
-  const [selectedClient, setSelectedClient] = useState(null);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [showAddClient, setShowAddClient] = useState(false);
   const [showAddNote, setShowAddNote] = useState(false);
   const [newClientName, setNewClientName] = useState('');
   const [newNote, setNewNote] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [editingNote, setEditingNote] = useState(null);
+  const [editingNote, setEditingNote] = useState<number | null>(null);
 
   // Add new client
   const addClient = () => {
@@ -29,7 +44,7 @@ const ClientNotesApp = () => {
   // Add note to selected client
   const addNote = () => {
     if (newNote.trim() && selectedClient) {
-      const note = {
+      const note: Note = {
         id: Date.now(),
         content: newNote.trim(),
         date: new Date().toISOString(),
@@ -53,7 +68,9 @@ const ClientNotesApp = () => {
   };
 
   // Delete note
-  const deleteNote = (noteId) => {
+  const deleteNote = (noteId: number) => {
+    if (!selectedClient) return;
+    
     setClients(clients.map(client => 
       client.id === selectedClient.id 
         ? { ...client, notes: client.notes.filter(note => note.id !== noteId) }
@@ -67,7 +84,9 @@ const ClientNotesApp = () => {
   };
 
   // Update note
-  const updateNote = (noteId, newContent) => {
+  const updateNote = (noteId: number, newContent: string) => {
+    if (!selectedClient) return;
+    
     setClients(clients.map(client => 
       client.id === selectedClient.id 
         ? { 
@@ -93,7 +112,7 @@ const ClientNotesApp = () => {
   };
 
   // Export functions
-  const exportClientNotes = (client) => {
+  const exportClientNotes = (client: Client) => {
     const content = `CLIENT NOTES: ${client.name}\n` +
       `Generated: ${new Date().toLocaleString()}\n` +
       `Total Notes: ${client.notes.length}\n\n` +
