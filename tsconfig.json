@@ -26,9 +26,10 @@
 }
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./*"],
+      "src/*": ["./*"]
     }
   }
 }
