@@ -23,4 +23,11 @@
   "include": [
     "src"
   ]
+  {
+  "compilerOptions": {
+    // ... your existing options
+  },
+  "exclude": [
+    "src/components/ui/**/*"
+  ]
 }
