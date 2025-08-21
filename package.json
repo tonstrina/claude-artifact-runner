@@ -86,4 +86,9 @@
     "@humanwhocodes/object-schema": "npm:@eslint/object-schema@latest",
     "inflight": "^2.0.1"
   }
+  {
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.3"
+  }
+}
 }
