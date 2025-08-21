@@ -177,7 +177,7 @@ const clientsWithNotes = await Promise.all(
 
       if (error) throw error;
 
-      const newClient = { ...data, notes: [] };
+      const newClient = { ...data as client, notes: [] };
       const updatedClients = [newClient, ...clients];
       setClients(updatedClients);
       saveToLocalStorage(updatedClients);
@@ -256,7 +256,7 @@ const clientsWithNotes = await Promise.all(
 
       const updatedClient = {
         ...selectedClient,
-        notes: [data, ...(selectedClient.notes || [])]
+        notes: [data as Note, ...(selectedClient.notes || [])]
       };
       
       const updatedClients = clients.map(client => 
