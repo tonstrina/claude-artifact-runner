@@ -83,22 +83,22 @@ const ClientNotesApp = () => {
       if (clientsError) throw clientsError;
 
       // Load notes for each client
-      const clientsWithNotes = await Promise.all(
-        (clientsData || []).map(async (client) => {
-          const { data: notesData, error: notesError } = await supabase!
-            .from('notes')
-            .select('*')
-            .eq('client_id', client.id)
-            .order('created_at', { ascending: false });
+const clientsWithNotes = await Promise.all(
+  (clientsData || []).map(async (client: any) => {
+    const { data: notesData, error: notesError } = await supabase!
+      .from('notes')
+      .select('*')
+      .eq('client_id', client.id as number)
+      .order('created_at', { ascending: false });
 
-          if (notesError) throw notesError;
+    if (notesError) throw notesError;
 
-          return {
-            ...client,
-            notes: notesData || []
-          };
-        })
-      );
+    return {
+      ...client,
+      notes: notesData || []
+    };
+  })
+);
 
       setClients(clientsWithNotes);
     } catch (err: any) {
