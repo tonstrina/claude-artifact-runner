@@ -832,4 +832,5 @@ const ClientNotesApp = () => {
     </div>
   );
 };
+
 export default ClientNotesApp;
