@@ -6,10 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
 const supabaseKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
 
-let supabase: ReturnType<typeof createClient> | null = null;
-if (supabaseUrl && supabaseKey) {
-  supabase = createClient(supabaseUrl, supabaseKey);
-}
+const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null;
 
 interface Note {
   id: number;
@@ -26,22 +23,36 @@ interface Client {
   notes?: Note[];
 }
 
-const ClientNotesApp = () => {
+interface SupabaseClient {
+  id: number;
+  name: string;
+  created_at: string;
+}
+
+interface SupabaseNote {
+  id: number;
+  client_id: number;
+  content: string;
+  created_at: string;
+  last_modified?: string;
+}
+
+const ClientNotesApp: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [showAddClient, setShowAddClient] = useState(false);
-  const [showAddNote, setShowAddNote] = useState(false);
-  const [newClientName, setNewClientName] = useState('');
-  const [newNote, setNewNote] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [showAddClient, setShowAddClient] = useState<boolean>(false);
+  const [showAddNote, setShowAddNote] = useState<boolean>(false);
+  const [newClientName, setNewClientName] = useState<string>('');
+  const [newNote, setNewNote] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [editingNote, setEditingNote] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [syncing, setSyncing] = useState(false);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [syncing, setSyncing] = useState<boolean>(false);
+  const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
 
   // Check if Supabase is configured
-  const isConfigured = supabaseUrl && supabaseKey && supabase;
+  const isConfigured = Boolean(supabaseUrl && supabaseKey && supabase);
 
   // Monitor online status
   useEffect(() => {
@@ -58,13 +69,13 @@ const ClientNotesApp = () => {
   }, []);
 
   // Load clients from Supabase
-  const loadClients = async () => {
-    if (!isConfigured) {
+  const loadClients = async (): Promise<void> => {
+    if (!isConfigured || !supabase) {
       // Fallback to localStorage if Supabase not configured
       try {
         const savedClients = localStorage.getItem('clientNotes');
         if (savedClients) {
-          setClients(JSON.parse(savedClients));
+          setClients(JSON.parse(savedClients) as Client[]);
         }
       } catch (error) {
         console.error('Error loading from localStorage:', error);
@@ -75,7 +86,7 @@ const ClientNotesApp = () => {
 
     try {
       setError(null);
-      const { data: clientsData, error: clientsError } = await supabase!
+      const { data: clientsData, error: clientsError } = await supabase
         .from('clients')
         .select('*')
         .order('created_at', { ascending: false });
@@ -83,22 +94,22 @@ const ClientNotesApp = () => {
       if (clientsError) throw clientsError;
 
       // Load notes for each client
-const clientsWithNotes = await Promise.all(
-  (clientsData || []).map(async (client: any) => {
-    const { data: notesData, error: notesError } = await supabase!
-      .from('notes')
-      .select('*')
-      .eq('client_id', client.id as number)
-      .order('created_at', { ascending: false });
+      const clientsWithNotes = await Promise.all(
+        (clientsData as SupabaseClient[] || []).map(async (client): Promise<Client> => {
+          const { data: notesData, error: notesError } = await supabase
+            .from('notes')
+            .select('*')
+            .eq('client_id', client.id)
+            .order('created_at', { ascending: false });
 
-    if (notesError) throw notesError;
+          if (notesError) throw notesError;
 
-    return {
-      ...client,
-      notes: notesData || []
-    };
-  })
-);
+          return {
+            ...client,
+            notes: (notesData as SupabaseNote[]) || []
+          };
+        })
+      );
 
       setClients(clientsWithNotes);
     } catch (err: any) {
@@ -109,7 +120,7 @@ const clientsWithNotes = await Promise.all(
       try {
         const savedClients = localStorage.getItem('clientNotes');
         if (savedClients) {
-          setClients(JSON.parse(savedClients));
+          setClients(JSON.parse(savedClients) as Client[]);
           setError(error + ' (Loaded from local backup)');
         }
       } catch (localError) {
@@ -121,7 +132,7 @@ const clientsWithNotes = await Promise.all(
   };
 
   // Save to localStorage as backup
-  const saveToLocalStorage = (clientsData: Client[]) => {
+  const saveToLocalStorage = (clientsData: Client[]): void => {
     try {
       localStorage.setItem('clientNotes', JSON.stringify(clientsData));
     } catch (error) {
@@ -142,12 +153,12 @@ const clientsWithNotes = await Promise.all(
   }, [clients]);
 
   // Add new client
-  const addClient = async () => {
+  const addClient = async (): Promise<void> => {
     if (!newClientName.trim()) return;
 
     const clientData = { name: newClientName.trim() };
 
-    if (!isConfigured || !isOnline) {
+    if (!isConfigured || !isOnline || !supabase) {
       // Fallback to local storage
       const newClient: Client = {
         id: Date.now(),
@@ -169,7 +180,7 @@ const clientsWithNotes = await Promise.all(
 
     setSyncing(true);
     try {
-      const { data, error } = await supabase!
+      const { data, error } = await supabase
         .from('clients')
         .insert([clientData])
         .select()
@@ -177,7 +188,7 @@ const clientsWithNotes = await Promise.all(
 
       if (error) throw error;
 
-      const newClient = { ...data as client, notes: [] };
+      const newClient: Client = { ...(data as SupabaseClient), notes: [] };
       const updatedClients = [newClient, ...clients];
       setClients(updatedClients);
       saveToLocalStorage(updatedClients);
@@ -206,7 +217,7 @@ const clientsWithNotes = await Promise.all(
   };
 
   // Add note to selected client
-  const addNote = async () => {
+  const addNote = async (): Promise<void> => {
     if (!newNote.trim() || !selectedClient) return;
 
     const noteData = {
@@ -214,16 +225,16 @@ const clientsWithNotes = await Promise.all(
       content: newNote.trim()
     };
 
-    if (!isConfigured || !isOnline) {
+    if (!isConfigured || !isOnline || !supabase) {
       // Fallback to local storage
-      const note = {
+      const note: Note = {
         id: Date.now(),
         client_id: selectedClient.id,
         content: newNote.trim(),
         created_at: new Date().toISOString()
       };
       
-      const updatedClient = {
+      const updatedClient: Client = {
         ...selectedClient,
         notes: [note, ...(selectedClient.notes || [])]
       };
@@ -246,7 +257,7 @@ const clientsWithNotes = await Promise.all(
 
     setSyncing(true);
     try {
-      const { data, error } = await supabase!
+      const { data, error } = await supabase
         .from('notes')
         .insert([noteData])
         .select()
@@ -254,9 +265,10 @@ const clientsWithNotes = await Promise.all(
 
       if (error) throw error;
 
-      const updatedClient = {
+      const newNoteData = data as SupabaseNote;
+      const updatedClient: Client = {
         ...selectedClient,
-        notes: [data as Note, ...(selectedClient.notes || [])]
+        notes: [newNoteData, ...(selectedClient.notes || [])]
       };
       
       const updatedClients = clients.map(client => 
@@ -274,14 +286,14 @@ const clientsWithNotes = await Promise.all(
       setError(`Failed to add note: ${err.message}`);
       
       // Add locally as fallback
-      const note = {
+      const note: Note = {
         id: Date.now(),
         client_id: selectedClient.id,
         content: newNote.trim(),
         created_at: new Date().toISOString()
       };
       
-      const updatedClient = {
+      const updatedClient: Client = {
         ...selectedClient,
         notes: [note, ...(selectedClient.notes || [])]
       };
@@ -301,12 +313,12 @@ const clientsWithNotes = await Promise.all(
   };
 
   // Delete note
-  const deleteNote = async (noteId: number) => {
+  const deleteNote = async (noteId: number): Promise<void> => {
     if (!selectedClient) return;
 
-    if (!isConfigured || !isOnline) {
+    if (!isConfigured || !isOnline || !supabase) {
       // Fallback to local storage
-      const updatedClient = {
+      const updatedClient: Client = {
         ...selectedClient,
         notes: (selectedClient.notes || []).filter(note => note.id !== noteId)
       };
@@ -327,14 +339,14 @@ const clientsWithNotes = await Promise.all(
 
     setSyncing(true);
     try {
-      const { error } = await supabase!
+      const { error } = await supabase
         .from('notes')
         .delete()
         .eq('id', noteId);
 
       if (error) throw error;
 
-      const updatedClient = {
+      const updatedClient: Client = {
         ...selectedClient,
         notes: (selectedClient.notes || []).filter(note => note.id !== noteId)
       };
@@ -356,7 +368,7 @@ const clientsWithNotes = await Promise.all(
   };
 
   // Update note
-  const updateNote = async (noteId: number, newContent: string) => {
+  const updateNote = async (noteId: number, newContent: string): Promise<void> => {
     if (!selectedClient) return;
 
     const updateData = {
@@ -364,9 +376,9 @@ const clientsWithNotes = await Promise.all(
       last_modified: new Date().toISOString()
     };
 
-    if (!isConfigured || !isOnline) {
+    if (!isConfigured || !isOnline || !supabase) {
       // Fallback to local storage
-      const updatedClient = {
+      const updatedClient: Client = {
         ...selectedClient,
         notes: (selectedClient.notes || []).map(note => 
           note.id === noteId 
@@ -392,7 +404,7 @@ const clientsWithNotes = await Promise.all(
 
     setSyncing(true);
     try {
-      const { data, error } = await supabase!
+      const { data, error } = await supabase
         .from('notes')
         .update(updateData)
         .eq('id', noteId)
@@ -401,10 +413,11 @@ const clientsWithNotes = await Promise.all(
 
       if (error) throw error;
 
-      const updatedClient = {
+      const updatedNoteData = data as SupabaseNote;
+      const updatedClient: Client = {
         ...selectedClient,
         notes: (selectedClient.notes || []).map(note => 
-          note.id === noteId ? data : note
+          note.id === noteId ? updatedNoteData : note
         )
       };
       
@@ -426,14 +439,14 @@ const clientsWithNotes = await Promise.all(
   };
 
   // Manual sync function
-  const syncData = async () => {
+  const syncData = async (): Promise<void> => {
     if (isConfigured && isOnline) {
       await loadClients();
     }
   };
 
   // Export functions
-  const exportClientNotes = (client: Client) => {
+  const exportClientNotes = (client: Client): void => {
     const content = `CLIENT NOTES: ${client.name}\n` +
       `Generated: ${new Date().toLocaleString()}\n` +
       `Total Notes: ${client.notes?.length || 0}\n\n` +
@@ -448,7 +461,7 @@ const clientsWithNotes = await Promise.all(
     downloadFile(`${client.name}_notes.txt`, content);
   };
 
-  const exportAllNotes = () => {
+  const exportAllNotes = (): void => {
     const content = `ALL CLIENT NOTES\n` +
       `Generated: ${new Date().toLocaleString()}\n` +
       `Total Clients: ${clients.length}\n` +
@@ -468,7 +481,7 @@ const clientsWithNotes = await Promise.all(
     downloadFile('all_client_notes.txt', content);
   };
 
-  const downloadFile = (filename: string, content: string) => {
+  const downloadFile = (filename: string, content: string): void => {
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
