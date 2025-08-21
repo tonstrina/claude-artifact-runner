@@ -75,7 +75,7 @@ const ClientNotesApp = () => {
 
     try {
       setError(null);
-      const { data: clientsData, error: clientsError } = await supabase
+      const { data: clientsData, error: clientsError } = await supabase!
         .from('clients')
         .select('*')
         .order('created_at', { ascending: false });
@@ -85,7 +85,7 @@ const ClientNotesApp = () => {
       // Load notes for each client
       const clientsWithNotes = await Promise.all(
         (clientsData || []).map(async (client) => {
-          const { data: notesData, error: notesError } = await supabase
+          const { data: notesData, error: notesError } = await supabase!
             .from('notes')
             .select('*')
             .eq('client_id', client.id)
@@ -169,7 +169,7 @@ const ClientNotesApp = () => {
 
     setSyncing(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from('clients')
         .insert([clientData])
         .select()
@@ -246,7 +246,7 @@ const ClientNotesApp = () => {
 
     setSyncing(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from('notes')
         .insert([noteData])
         .select()
@@ -327,7 +327,7 @@ const ClientNotesApp = () => {
 
     setSyncing(true);
     try {
-      const { error } = await supabase
+      const { error } = await supabase!
         .from('notes')
         .delete()
         .eq('id', noteId);
@@ -392,7 +392,7 @@ const ClientNotesApp = () => {
 
     setSyncing(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from('notes')
         .update(updateData)
         .eq('id', noteId)
