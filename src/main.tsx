@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import ClientNotesApp from './artifacts/index.tsx'
+import ClientNotesApp from './artifacts'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
