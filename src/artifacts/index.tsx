@@ -500,10 +500,6 @@ useEffect(() => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-    <div className="bg-red-500 text-white p-4">CSS TEST</div>
-    {/* Animated background elements */}
-    <div className="absolute inset-0 overflow-hidden"> 
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
         <div className="text-center">
           <div className="relative">
