@@ -141,9 +141,9 @@ const ClientNotesApp: React.FC = () => {
   };
 
   // Load data on component mount
-  useEffect(() => {
-    loadClients();
-  }, []);
+useEffect(() => {
+  loadClients();
+}, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Save to localStorage whenever clients change
   useEffect(() => {
