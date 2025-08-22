@@ -71,7 +71,6 @@ const ClientNotesApp: React.FC = () => {
   // Load clients from Supabase
   const loadClients = async (): Promise<void> => {
     if (!isConfigured || !supabase) {
-      // Fallback to localStorage if Supabase not configured
       try {
         const savedClients = localStorage.getItem('clientNotes');
         if (savedClients) {
@@ -93,7 +92,6 @@ const ClientNotesApp: React.FC = () => {
 
       if (clientsError) throw clientsError;
 
-      // Load notes for each client
       const clientsWithNotes = await Promise.all(
         (clientsData as SupabaseClient[] || []).map(async (client): Promise<Client> => {
           const { data: notesData, error: notesError } = await supabase
@@ -116,7 +114,6 @@ const ClientNotesApp: React.FC = () => {
       console.error('Error loading clients:', err);
       setError(`Failed to load data: ${err.message || 'Unknown error'}`);
       
-      // Fallback to localStorage on error
       try {
         const savedClients = localStorage.getItem('clientNotes');
         if (savedClients) {
@@ -131,7 +128,6 @@ const ClientNotesApp: React.FC = () => {
     }
   };
 
-  // Save to localStorage as backup
   const saveToLocalStorage = (clientsData: Client[]): void => {
     try {
       localStorage.setItem('clientNotes', JSON.stringify(clientsData));
@@ -140,26 +136,22 @@ const ClientNotesApp: React.FC = () => {
     }
   };
 
-  // Load data on component mount
-useEffect(() => {
-  loadClients();
-}, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    loadClients();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Save to localStorage whenever clients change
   useEffect(() => {
     if (clients.length > 0) {
       saveToLocalStorage(clients);
     }
   }, [clients]);
 
-  // Add new client
   const addClient = async (): Promise<void> => {
     if (!newClientName.trim()) return;
 
     const clientData = { name: newClientName.trim() };
 
     if (!isConfigured || !isOnline || !supabase) {
-      // Fallback to local storage
       const newClient: Client = {
         id: Date.now(),
         name: newClientName.trim(),
@@ -199,7 +191,6 @@ useEffect(() => {
       console.error('Error adding client:', err);
       setError(`Failed to add client: ${err.message}`);
       
-      // Add locally as fallback
       const newClient: Client = {
         id: Date.now(),
         name: newClientName.trim(),
@@ -216,7 +207,6 @@ useEffect(() => {
     }
   };
 
-  // Add note to selected client
   const addNote = async (): Promise<void> => {
     if (!newNote.trim() || !selectedClient) return;
 
@@ -226,7 +216,6 @@ useEffect(() => {
     };
 
     if (!isConfigured || !isOnline || !supabase) {
-      // Fallback to local storage
       const note: Note = {
         id: Date.now(),
         client_id: selectedClient.id,
@@ -285,7 +274,6 @@ useEffect(() => {
       console.error('Error adding note:', err);
       setError(`Failed to add note: ${err.message}`);
       
-      // Add locally as fallback
       const note: Note = {
         id: Date.now(),
         client_id: selectedClient.id,
@@ -312,12 +300,10 @@ useEffect(() => {
     }
   };
 
-  // Delete note
   const deleteNote = async (noteId: number): Promise<void> => {
     if (!selectedClient) return;
 
     if (!isConfigured || !isOnline || !supabase) {
-      // Fallback to local storage
       const updatedClient: Client = {
         ...selectedClient,
         notes: (selectedClient.notes || []).filter(note => note.id !== noteId)
@@ -367,7 +353,6 @@ useEffect(() => {
     }
   };
 
-  // Update note
   const updateNote = async (noteId: number, newContent: string): Promise<void> => {
     if (!selectedClient) return;
 
@@ -377,7 +362,6 @@ useEffect(() => {
     };
 
     if (!isConfigured || !isOnline || !supabase) {
-      // Fallback to local storage
       const updatedClient: Client = {
         ...selectedClient,
         notes: (selectedClient.notes || []).map(note => 
@@ -438,14 +422,12 @@ useEffect(() => {
     }
   };
 
-  // Manual sync function
   const syncData = async (): Promise<void> => {
     if (isConfigured && isOnline) {
       await loadClients();
     }
   };
 
-  // Export functions
   const exportClientNotes = (client: Client): void => {
     const content = `CLIENT NOTES: ${client.name}\n` +
       `Generated: ${new Date().toLocaleString()}\n` +
@@ -493,7 +475,6 @@ useEffect(() => {
     URL.revokeObjectURL(url);
   };
 
-  // Filter clients based on search
   const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -517,7 +498,8 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* Animated background elements */}
+      <div className="bg-red-500 text-white p-4">CSS TEST</div>
+      
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
@@ -525,7 +507,6 @@ useEffect(() => {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto p-6">
-        {/* Header */}
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 mb-8">
           <div className="flex justify-between items-start">
             <div className="flex-1">
@@ -614,7 +595,6 @@ useEffect(() => {
             </div>
           </div>
 
-          {/* Status Messages */}
           {error && (
             <div className="mt-6 p-4 bg-red-500/20 border border-red-400/30 rounded-xl backdrop-blur-sm flex items-center gap-3">
               <div className="p-2 bg-red-500/30 rounded-lg">
@@ -629,32 +609,9 @@ useEffect(() => {
               </button>
             </div>
           )}
-
-          {!isConfigured && (
-            <div className="mt-6 p-4 bg-amber-500/20 border border-amber-400/30 rounded-xl backdrop-blur-sm flex items-center gap-3">
-              <div className="p-2 bg-amber-500/30 rounded-lg">
-                <AlertCircle className="h-5 w-5 text-amber-200" />
-              </div>
-              <span className="text-amber-100 font-medium">
-                Cloud sync disabled. Configure REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_ANON_KEY to enable.
-              </span>
-            </div>
-          )}
-
-          {!isOnline && (
-            <div className="mt-6 p-4 bg-orange-500/20 border border-orange-400/30 rounded-xl backdrop-blur-sm flex items-center gap-3">
-              <div className="p-2 bg-orange-500/30 rounded-lg">
-                <WifiOff className="h-5 w-5 text-orange-200" />
-              </div>
-              <span className="text-orange-100 font-medium">
-                Offline mode active. Changes will sync when connection is restored.
-              </span>
-            </div>
-          )}
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          {/* Client List */}
           <div className="xl:col-span-1">
             <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-6">
               <div className="flex items-center justify-between mb-6">
@@ -666,7 +623,6 @@ useEffect(() => {
                 </h2>
               </div>
 
-              {/* Search */}
               <div className="relative mb-6">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Search className="h-5 w-5 text-purple-300" />
@@ -727,7 +683,6 @@ useEffect(() => {
             </div>
           </div>
 
-          {/* Notes Section */}
           <div className="xl:col-span-2">
             {selectedClient ? (
               <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8">
@@ -869,7 +824,6 @@ useEffect(() => {
           </div>
         </div>
 
-        {/* Add Client Modal */}
         {showAddClient && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl p-8 w-full max-w-md">
@@ -905,7 +859,6 @@ useEffect(() => {
           </div>
         )}
 
-        {/* Add Note Modal */}
         {showAddNote && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl p-8 w-full max-w-2xl">
