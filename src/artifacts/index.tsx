@@ -500,11 +500,15 @@ const ClientNotesApp: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <Cloud className="h-12 w-12 mx-auto mb-4 text-blue-600 animate-pulse" />
-          <p className="text-gray-600">
-            {isConfigured ? 'Loading your notes from the cloud...' : 'Loading your notes...'}
+          <div className="relative">
+            <div className="w-20 h-20 border-4 border-purple-200 border-t-purple-500 rounded-full animate-spin mx-auto mb-8"></div>
+            <div className="absolute inset-0 w-20 h-20 border-4 border-transparent border-t-blue-500 rounded-full animate-spin animation-delay-150 mx-auto"></div>
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-2">Loading Your Workspace</h2>
+          <p className="text-purple-200">
+            {isConfigured ? 'Syncing from the cloud...' : 'Preparing your notes...'}
           </p>
         </div>
       </div>
@@ -512,119 +516,138 @@ const ClientNotesApp: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      <div className="max-w-7xl mx-auto p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-40 left-40 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto p-6">
         {/* Header */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8 mb-8">
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 mb-8">
           <div className="flex justify-between items-start">
             <div className="flex-1">
-              <div className="flex items-center gap-4 mb-3">
-                <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-                  <FileText className="h-8 w-8 text-white" />
+              <div className="flex items-center gap-6 mb-4">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-75"></div>
+                  <div className="relative bg-gradient-to-r from-blue-500 to-purple-600 p-4 rounded-2xl">
+                    <FileText className="h-10 w-10 text-white" />
+                  </div>
                 </div>
                 <div>
-                  <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                    Client Notes Manager
+                  <h1 className="text-5xl font-black bg-gradient-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent mb-3">
+                    Client Notes
                   </h1>
-                  <div className="flex items-center gap-3 mt-2">
+                  <div className="flex items-center gap-4">
                     {isOnline ? (
-                      <div className="flex items-center gap-2 px-3 py-1 bg-emerald-100 rounded-full">
-                        <Wifi className="h-4 w-4 text-emerald-600" />
-                        <span className="text-emerald-700 text-sm font-medium">Online</span>
+                      <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/20 border border-emerald-400/30 rounded-full backdrop-blur-sm">
+                        <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                        <Wifi className="h-4 w-4 text-emerald-300" />
+                        <span className="text-emerald-200 text-sm font-semibold">Online</span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2 px-3 py-1 bg-red-100 rounded-full">
-                        <WifiOff className="h-4 w-4 text-red-600" />
-                        <span className="text-red-700 text-sm font-medium">Offline</span>
+                      <div className="flex items-center gap-2 px-4 py-2 bg-red-500/20 border border-red-400/30 rounded-full backdrop-blur-sm">
+                        <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                        <WifiOff className="h-4 w-4 text-red-300" />
+                        <span className="text-red-200 text-sm font-semibold">Offline</span>
                       </div>
                     )}
                     {isConfigured && (
-                      <div className="flex items-center gap-2 px-3 py-1 bg-blue-100 rounded-full">
-                        <Cloud className={`h-4 w-4 ${syncing ? 'animate-pulse text-amber-600' : 'text-blue-600'}`} />
-                        <span className="text-blue-700 text-sm font-medium">
-                          {syncing ? 'Syncing...' : isOnline ? 'Cloud Connected' : 'Offline Mode'}
+                      <div className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 border border-blue-400/30 rounded-full backdrop-blur-sm">
+                        <Cloud className={`h-4 w-4 ${syncing ? 'animate-spin text-yellow-300' : 'text-blue-300'}`} />
+                        <span className="text-blue-200 text-sm font-semibold">
+                          {syncing ? 'Syncing...' : 'Cloud Ready'}
                         </span>
                       </div>
                     )}
                   </div>
                 </div>
               </div>
-              <p className="text-gray-600 text-lg leading-relaxed max-w-2xl">
+              <p className="text-lg text-purple-100 leading-relaxed max-w-2xl">
                 {isConfigured 
                   ? isOnline 
-                    ? 'Your notes are automatically saved to the cloud and synced across devices'
-                    : 'Working offline - changes will sync when connection is restored'
-                  : 'Manage and track your client interactions (local storage only)'
+                    ? 'Your notes sync seamlessly across all devices with enterprise-grade security'
+                    : 'Working offline - changes will sync automatically when reconnected'
+                  : 'Secure local storage keeps your notes private and accessible'
                 }
               </p>
             </div>
-            <div className="flex gap-3 ml-6">
+            <div className="flex gap-4 ml-8">
               {isConfigured && (
                 <button
                   onClick={syncData}
                   disabled={syncing || !isOnline}
-                  className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 hover:from-purple-700 hover:to-purple-800 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                  className="group relative px-6 py-4 bg-gradient-to-r from-purple-600 to-purple-700 rounded-2xl overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                 >
-                  <Cloud className="h-5 w-5" />
-                  Sync
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-700 to-purple-800 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                  <div className="relative flex items-center gap-3 text-white font-semibold">
+                    <Cloud className="h-5 w-5" />
+                    Sync
+                  </div>
                 </button>
               )}
               <button
                 onClick={() => setShowAddClient(true)}
                 disabled={syncing}
-                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className="group relative px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
               >
-                <Plus className="h-5 w-5" />
-                Add Client
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-blue-800 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                <div className="relative flex items-center gap-3 text-white font-semibold">
+                  <Plus className="h-5 w-5" />
+                  Add Client
+                </div>
               </button>
               {clients.length > 0 && (
                 <button
                   onClick={exportAllNotes}
-                  className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 shadow-lg hover:shadow-xl font-medium"
+                  className="group relative px-6 py-4 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl overflow-hidden transition-all duration-300"
                 >
-                  <Download className="h-5 w-5" />
-                  Export All
+                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-700 to-emerald-800 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                  <div className="relative flex items-center gap-3 text-white font-semibold">
+                    <Download className="h-5 w-5" />
+                    Export All
+                  </div>
                 </button>
               )}
             </div>
           </div>
 
-          {/* Error Banner */}
+          {/* Status Messages */}
           {error && (
-            <div className="mt-6 p-4 bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-xl flex items-center gap-3 shadow-sm">
-              <div className="p-2 bg-red-200 rounded-lg">
-                <AlertCircle className="h-5 w-5 text-red-600" />
+            <div className="mt-6 p-4 bg-red-500/20 border border-red-400/30 rounded-xl backdrop-blur-sm flex items-center gap-3">
+              <div className="p-2 bg-red-500/30 rounded-lg">
+                <AlertCircle className="h-5 w-5 text-red-200" />
               </div>
-              <span className="text-red-800 font-medium flex-1">{error}</span>
+              <span className="text-red-100 font-medium flex-1">{error}</span>
               <button 
                 onClick={() => setError(null)}
-                className="text-red-600 hover:text-red-800 transition-colors p-1 hover:bg-red-200 rounded-lg"
+                className="text-red-200 hover:text-white transition-colors p-1 hover:bg-red-500/30 rounded-lg"
               >
                 ×
               </button>
             </div>
           )}
 
-          {/* Configuration Warning */}
           {!isConfigured && (
-            <div className="mt-6 p-4 bg-gradient-to-r from-amber-50 to-yellow-100 border border-amber-200 rounded-xl flex items-center gap-3 shadow-sm">
-              <div className="p-2 bg-amber-200 rounded-lg">
-                <AlertCircle className="h-5 w-5 text-amber-600" />
+            <div className="mt-6 p-4 bg-amber-500/20 border border-amber-400/30 rounded-xl backdrop-blur-sm flex items-center gap-3">
+              <div className="p-2 bg-amber-500/30 rounded-lg">
+                <AlertCircle className="h-5 w-5 text-amber-200" />
               </div>
-              <span className="text-amber-800 font-medium">
-                Cloud storage not configured. Add REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_ANON_KEY environment variables to enable cloud sync.
+              <span className="text-amber-100 font-medium">
+                Cloud sync disabled. Configure REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_ANON_KEY to enable.
               </span>
             </div>
           )}
 
-          {/* Offline Warning */}
           {!isOnline && (
-            <div className="mt-6 p-4 bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-xl flex items-center gap-3 shadow-sm">
-              <div className="p-2 bg-orange-200 rounded-lg">
-                <WifiOff className="h-5 w-5 text-orange-600" />
+            <div className="mt-6 p-4 bg-orange-500/20 border border-orange-400/30 rounded-xl backdrop-blur-sm flex items-center gap-3">
+              <div className="p-2 bg-orange-500/30 rounded-lg">
+                <WifiOff className="h-5 w-5 text-orange-200" />
               </div>
-              <span className="text-orange-800 font-medium">
-                You're currently offline. Changes are being saved locally and will sync when connection is restored.
+              <span className="text-orange-100 font-medium">
+                Offline mode active. Changes will sync when connection is restored.
               </span>
             </div>
           )}
@@ -633,11 +656,11 @@ const ClientNotesApp: React.FC = () => {
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           {/* Client List */}
           <div className="xl:col-span-1">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                  <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg">
-                    <User className="h-5 w-5 text-white" />
+                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                  <div className="p-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl shadow-lg">
+                    <User className="h-6 w-6 text-white" />
                   </div>
                   Clients ({clients.length})
                 </h2>
@@ -646,14 +669,14 @@ const ClientNotesApp: React.FC = () => {
               {/* Search */}
               <div className="relative mb-6">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gray-400" />
+                  <Search className="h-5 w-5 text-purple-300" />
                 </div>
                 <input
                   type="text"
                   placeholder="Search clients..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-500"
+                  className="w-full pl-12 pr-4 py-4 bg-white/10 border border-white/20 rounded-2xl focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-200 placeholder-purple-300 text-white backdrop-blur-sm"
                 />
               </div>
 
@@ -662,20 +685,22 @@ const ClientNotesApp: React.FC = () => {
                   <div
                     key={client.id}
                     onClick={() => setSelectedClient(client)}
-                    className={`p-4 rounded-xl cursor-pointer transition-all duration-200 group ${
+                    className={`p-4 rounded-2xl cursor-pointer transition-all duration-300 group ${
                       selectedClient?.id === client.id
-                        ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 shadow-md'
-                        : 'bg-gray-50 hover:bg-white border-2 border-transparent hover:border-gray-200 hover:shadow-lg'
+                        ? 'bg-gradient-to-r from-purple-500/30 to-blue-500/30 border-2 border-purple-400/50 shadow-lg shadow-purple-500/20'
+                        : 'bg-white/5 hover:bg-white/10 border-2 border-transparent hover:border-white/20 hover:shadow-lg'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-3 h-3 rounded-full ${
-                        selectedClient?.id === client.id ? 'bg-blue-500' : 'bg-gray-300 group-hover:bg-gray-400'
+                    <div className="flex items-center gap-4">
+                      <div className={`w-4 h-4 rounded-full transition-all duration-300 ${
+                        selectedClient?.id === client.id 
+                          ? 'bg-gradient-to-r from-purple-400 to-blue-400 shadow-lg shadow-purple-400/50' 
+                          : 'bg-white/30 group-hover:bg-white/50'
                       }`} />
                       <div className="flex-1">
-                        <div className="font-semibold text-gray-900">{client.name}</div>
-                        <div className="text-sm text-gray-600 flex items-center gap-4 mt-1">
-                          <span className="flex items-center gap-1">
+                        <div className="font-bold text-white text-lg">{client.name}</div>
+                        <div className="text-sm text-purple-200 flex items-center gap-4 mt-1">
+                          <span className="flex items-center gap-2">
                             <FileText className="h-4 w-4" />
                             {client.notes?.length || 0} notes
                           </span>
@@ -686,14 +711,14 @@ const ClientNotesApp: React.FC = () => {
                   </div>
                 ))}
                 {filteredClients.length === 0 && (
-                  <div className="text-center py-12 text-gray-500">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <User className="h-8 w-8 text-gray-400" />
+                  <div className="text-center py-12 text-purple-200">
+                    <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <User className="h-10 w-10 text-purple-300" />
                     </div>
-                    <p className="text-lg font-medium">
-                      {searchTerm ? 'No clients found' : 'No clients yet'}
-                    </p>
-                    <p className="text-sm text-gray-400 mt-1">
+                    <h3 className="text-xl font-bold mb-2">
+                      {searchTerm ? 'No matches found' : 'No clients yet'}
+                    </h3>
+                    <p className="text-purple-300">
                       {searchTerm ? 'Try a different search term' : 'Add your first client to get started'}
                     </p>
                   </div>
@@ -705,48 +730,54 @@ const ClientNotesApp: React.FC = () => {
           {/* Notes Section */}
           <div className="xl:col-span-2">
             {selectedClient ? (
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
+              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8">
                 <div className="flex items-center justify-between mb-8">
                   <div>
-                    <h2 className="text-3xl font-bold text-gray-900">{selectedClient.name}</h2>
-                    <p className="text-lg text-gray-600 mt-1">
+                    <h2 className="text-4xl font-bold text-white mb-2">{selectedClient.name}</h2>
+                    <p className="text-xl text-purple-200">
                       {selectedClient.notes?.length || 0} {(selectedClient.notes?.length || 0) === 1 ? 'note' : 'notes'}
                     </p>
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex gap-4">
                     <button
                       onClick={() => setShowAddNote(true)}
                       disabled={syncing}
-                      className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                      className="group relative px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                     >
-                      <Plus className="h-5 w-5" />
-                      Add Note
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-blue-800 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                      <div className="relative flex items-center gap-3 text-white font-semibold">
+                        <Plus className="h-5 w-5" />
+                        Add Note
+                      </div>
                     </button>
                     <button
                       onClick={() => exportClientNotes(selectedClient)}
-                      className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 shadow-lg hover:shadow-xl font-medium"
+                      className="group relative px-6 py-4 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl overflow-hidden transition-all duration-300"
                     >
-                      <Download className="h-5 w-5" />
-                      Export
+                      <div className="absolute inset-0 bg-gradient-to-r from-emerald-700 to-emerald-800 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                      <div className="relative flex items-center gap-3 text-white font-semibold">
+                        <Download className="h-5 w-5" />
+                        Export
+                      </div>
                     </button>
                   </div>
                 </div>
 
                 <div className="space-y-6 max-h-96 overflow-y-auto pr-2">
                   {(selectedClient.notes || []).map(note => (
-                    <div key={note.id} className="bg-gradient-to-r from-gray-50 to-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-200">
+                    <div key={note.id} className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300">
                       <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center gap-3 text-sm text-gray-600">
-                          <div className="p-2 bg-blue-100 rounded-lg">
-                            <Calendar className="h-4 w-4 text-blue-600" />
+                        <div className="flex items-center gap-4 text-sm text-purple-200">
+                          <div className="p-3 bg-gradient-to-r from-blue-500/30 to-purple-500/30 rounded-xl border border-white/20">
+                            <Calendar className="h-5 w-5 text-blue-200" />
                           </div>
                           <div>
-                            <span className="font-medium">{new Date(note.created_at).toLocaleDateString()}</span>
-                            <span className="block text-xs text-gray-500">{new Date(note.created_at).toLocaleTimeString()}</span>
+                            <div className="font-semibold text-white text-base">{new Date(note.created_at).toLocaleDateString()}</div>
+                            <div className="text-purple-300">{new Date(note.created_at).toLocaleTimeString()}</div>
                             {note.last_modified && (
-                              <span className="block text-xs text-gray-500 mt-1">
+                              <div className="text-purple-400 text-xs mt-1">
                                 Modified: {new Date(note.last_modified).toLocaleString()}
-                              </span>
+                              </div>
                             )}
                           </div>
                         </div>
@@ -754,16 +785,16 @@ const ClientNotesApp: React.FC = () => {
                           <button
                             onClick={() => setEditingNote(note.id)}
                             disabled={syncing}
-                            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 disabled:opacity-50"
+                            className="p-3 text-purple-200 hover:text-white hover:bg-white/20 rounded-xl transition-all duration-200 disabled:opacity-50"
                           >
-                            <Edit2 className="h-4 w-4" />
+                            <Edit2 className="h-5 w-5" />
                           </button>
                           <button
                             onClick={() => deleteNote(note.id)}
                             disabled={syncing}
-                            className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 disabled:opacity-50"
+                            className="p-3 text-purple-200 hover:text-red-300 hover:bg-red-500/20 rounded-xl transition-all duration-200 disabled:opacity-50"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-5 w-5" />
                           </button>
                         </div>
                       </div>
@@ -772,7 +803,7 @@ const ClientNotesApp: React.FC = () => {
                         <div className="space-y-4">
                           <textarea
                             defaultValue={note.content}
-                            className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-24 resize-y bg-white"
+                            className="w-full p-4 bg-white/10 border border-white/20 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent min-h-32 resize-y text-white placeholder-purple-300 backdrop-blur-sm"
                             onKeyDown={(e) => {
                               if (e.key === 'Enter' && e.ctrlKey) {
                                 updateNote(note.id, (e.target as HTMLTextAreaElement).value);
@@ -786,49 +817,52 @@ const ClientNotesApp: React.FC = () => {
                                 updateNote(note.id, textarea.value);
                               }}
                               disabled={syncing}
-                              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg text-sm hover:from-blue-700 hover:to-blue-800 transition-all duration-200 disabled:opacity-50 font-medium"
+                              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 disabled:opacity-50 font-semibold"
                             >
                               Save Changes
                             </button>
                             <button
                               onClick={() => setEditingNote(null)}
-                              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-300 transition-all duration-200 font-medium"
+                              className="px-6 py-3 bg-white/20 text-white rounded-xl hover:bg-white/30 transition-all duration-200 font-semibold"
                             >
                               Cancel
                             </button>
                           </div>
                         </div>
                       ) : (
-                        <div className="text-gray-900 leading-relaxed whitespace-pre-wrap">{note.content}</div>
+                        <div className="text-white leading-relaxed whitespace-pre-wrap text-lg">{note.content}</div>
                       )}
                     </div>
                   ))}
                   {(selectedClient.notes?.length || 0) === 0 && (
-                    <div className="text-center py-16">
-                      <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <FileText className="h-10 w-10 text-gray-400" />
+                    <div className="text-center py-20">
+                      <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-8">
+                        <FileText className="h-12 w-12 text-purple-300" />
                       </div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">No notes yet</h3>
-                      <p className="text-gray-600 mb-6">Add your first note for {selectedClient.name} to get started</p>
+                      <h3 className="text-2xl font-bold text-white mb-4">No notes yet</h3>
+                      <p className="text-purple-200 mb-8 text-lg">Create your first note for {selectedClient.name}</p>
                       <button
                         onClick={() => setShowAddNote(true)}
-                        className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl font-medium mx-auto"
+                        className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl overflow-hidden transition-all duration-300"
                       >
-                        <Plus className="h-5 w-5" />
-                        Add First Note
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-blue-800 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                        <div className="relative flex items-center gap-3 text-white font-semibold text-lg">
+                          <Plus className="h-6 w-6" />
+                          Create First Note
+                        </div>
                       </button>
                     </div>
                   )}
                 </div>
               </div>
             ) : (
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8 text-center">
-                <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <User className="h-12 w-12 text-gray-400" />
+              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-12 text-center">
+                <div className="w-32 h-32 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-8">
+                  <User className="h-16 w-16 text-purple-300" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Select a Client</h3>
-                <p className="text-lg text-gray-600 max-w-md mx-auto">
-                  Choose a client from the list to view and manage their notes, or add a new client to get started
+                <h3 className="text-3xl font-bold text-white mb-4">Select a Client</h3>
+                <p className="text-xl text-purple-200 max-w-md mx-auto leading-relaxed">
+                  Choose a client from the sidebar to view their notes, or create a new client to get started
                 </p>
               </div>
             )}
@@ -837,15 +871,15 @@ const ClientNotesApp: React.FC = () => {
 
         {/* Add Client Modal */}
         {showAddClient && (
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-3xl shadow-2xl border border-white/20 p-8 w-full max-w-md transform transition-all">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Add New Client</h3>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl p-8 w-full max-w-md">
+              <h3 className="text-2xl font-bold text-white mb-6">Add New Client</h3>
               <input
                 type="text"
                 placeholder="Enter client name..."
                 value={newClientName}
                 onChange={(e) => setNewClientName(e.target.value)}
-                className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-6 text-lg"
+                className="w-full p-4 bg-white/10 border border-white/20 rounded-2xl focus:ring-2 focus:ring-purple-400 focus:border-transparent mb-6 text-white placeholder-purple-300 text-lg backdrop-blur-sm"
                 onKeyDown={(e) => e.key === 'Enter' && !syncing && addClient()}
                 autoFocus
               />
@@ -855,16 +889,16 @@ const ClientNotesApp: React.FC = () => {
                     setShowAddClient(false);
                     setNewClientName('');
                   }}
-                  className="px-6 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200 font-medium"
+                  className="px-6 py-3 text-purple-200 hover:text-white hover:bg-white/20 rounded-2xl transition-all duration-200 font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={addClient}
                   disabled={syncing}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl font-medium"
+                  className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
                 >
-                  {syncing ? 'Adding...' : 'Add Client'}
+                  {syncing ? 'Creating...' : 'Create Client'}
                 </button>
               </div>
             </div>
@@ -873,16 +907,16 @@ const ClientNotesApp: React.FC = () => {
 
         {/* Add Note Modal */}
         {showAddNote && (
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-3xl shadow-2xl border border-white/20 p-8 w-full max-w-2xl transform transition-all">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">
-                Add Note for <span className="text-blue-600">{selectedClient?.name}</span>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl p-8 w-full max-w-2xl">
+              <h3 className="text-2xl font-bold text-white mb-6">
+                New Note for <span className="text-blue-300">{selectedClient?.name}</span>
               </h3>
               <textarea
-                placeholder="Enter your note here..."
+                placeholder="What's on your mind?"
                 value={newNote}
                 onChange={(e) => setNewNote(e.target.value)}
-                className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-6 h-40 resize-y"
+                className="w-full p-4 bg-white/10 border border-white/20 rounded-2xl focus:ring-2 focus:ring-purple-400 focus:border-transparent mb-6 h-48 resize-y text-white placeholder-purple-300 backdrop-blur-sm"
                 autoFocus
               />
               <div className="flex gap-4 justify-end">
@@ -891,16 +925,16 @@ const ClientNotesApp: React.FC = () => {
                     setShowAddNote(false);
                     setNewNote('');
                   }}
-                  className="px-6 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-200 font-medium"
+                  className="px-6 py-3 text-purple-200 hover:text-white hover:bg-white/20 rounded-2xl transition-all duration-200 font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={addNote}
                   disabled={syncing}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl font-medium"
+                  className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
                 >
-                  {syncing ? 'Adding...' : 'Add Note'}
+                  {syncing ? 'Saving...' : 'Save Note'}
                 </button>
               </div>
             </div>
