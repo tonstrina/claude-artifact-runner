@@ -11,7 +11,9 @@
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "lucide-react": "^0.263.1",
-    "sass": "^1.69.5"
+    "sass": "^1.69.5",
+    "react-router": "^6.x.x",
+    "react-router-dom": "^6.x.x"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",
